@@ -81,16 +81,5 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Publish to Modrinth
-        if: steps.tag.outputs.tag_exists == 'false'
-        uses: cloudnode-pro/modrinth-publish@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project: BfVAPsBN
-          version: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
-          loaders: fabric
-          game-versions: 1.21.11
-          files: ${{ steps.jar.outputs.jar }}
+      - name: Build
+        run: ./gradlew build

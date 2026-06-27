@@ -27,7 +27,7 @@ public class ClientIDBypassMod implements ClientModInitializer {
             context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new ModCheckPayload("valid_checksum")));
         });
         ClientPlayNetworking.registerGlobalReceiver(ModListPayload.ID, (payload, context) -> {
-            context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new ModListPayload("clientid,sodium,lithium,phosphor,iris")));
+            context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new ModListPayload("clientid,fabric-api")));
         });
         ClientPlayNetworking.registerGlobalReceiver(PackListPayload.ID, (payload, context) -> {
             context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new PackListPayload("")));
@@ -38,7 +38,7 @@ public class ClientIDBypassMod implements ClientModInitializer {
 
         ClientPlayConnectionEvents.JOIN.register((listener, sender, client) -> {
             ClientPlayNetworking.send(new ModCheckPayload("valid_checksum"));
-            ClientPlayNetworking.send(new ModListPayload("clientid,sodium,lithium,phosphor,iris"));
+            ClientPlayNetworking.send(new ModListPayload("clientid,fabric-api"));
             ClientPlayNetworking.send(new PackListPayload(""));
             ClientPlayNetworking.send(new ClientVersionPayload("1.1.7"));
         });
