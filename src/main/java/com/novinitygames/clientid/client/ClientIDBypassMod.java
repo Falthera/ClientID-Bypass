@@ -1,12 +1,12 @@
 package com.novinitygames.clientid.client;
 
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ClientIDBypassMod implements ModInitializer {
+public class ClientIDBypassMod implements ClientModInitializer {
     public static final String MODCHECK_CHANNEL = "clientid:modcheck";
     public static final String MODLIST_CHANNEL = "clientid:modlist";
     public static final String PACKLIST_CHANNEL = "clientid:packlist";
