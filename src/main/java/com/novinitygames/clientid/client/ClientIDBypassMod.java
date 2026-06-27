@@ -1,14 +1,13 @@
 package com.novinitygames.clientid.client;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-
 import com.novinitygames.clientid.client.records.ChartsS2CPayload;
 import com.novinitygames.clientid.client.records.ModCheckC2SPayload;
 import com.novinitygames.clientid.client.records.ModListC2SPayload;
 import com.novinitygames.clientid.client.records.PackListC2SPayload;
 import com.novinitygames.clientid.client.records.VersionC2SPayload;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ClientIDBypassMod implements ClientModInitializer {
     public static Boolean isConnectedToServer = false;
@@ -19,19 +18,6 @@ public class ClientIDBypassMod implements ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             isConnectedToServer = true;
             sendBypassPackets();
-        });
-
-        ClientPlayNetworking.registerGlobalReceiver(ModCheckC2SPayload.ID, (payload, ctx) -> {
-            ctx.responseSender().sendPacket(new ModCheckC2SPayload("valid_checksum"));
-        });
-        ClientPlayNetworking.registerGlobalReceiver(ModListC2SPayload.ID, (payload, ctx) -> {
-            ctx.responseSender().sendPacket(new ModListC2SPayload("clientid,fabric-api,fabricloader,sponge-mixin,mixinextras"));
-        });
-        ClientPlayNetworking.registerGlobalReceiver(PackListC2SPayload.ID, (payload, ctx) -> {
-            ctx.responseSender().sendPacket(new PackListC2SPayload(""));
-        });
-        ClientPlayNetworking.registerGlobalReceiver(VersionC2SPayload.ID, (payload, ctx) -> {
-            ctx.responseSender().sendPacket(new VersionC2SPayload("1.1.7"));
         });
 
         ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {
