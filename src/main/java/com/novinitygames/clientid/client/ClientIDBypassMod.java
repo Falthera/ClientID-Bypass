@@ -13,7 +13,7 @@ public class ClientIDBypassMod implements ClientModInitializer {
     public static final String CLIENTVERSION_CHANNEL = "clientid:clientversion";
 
     @Override
-    public void onInitialize() {
+    public void onInitializeClient() {
         ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODCHECK_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModCheckPacket()));
         ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModListPacket()));
         ClientLoginNetworking.registerGlobalReceiver(Identifier.of(PACKLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createPackListPacket()));
