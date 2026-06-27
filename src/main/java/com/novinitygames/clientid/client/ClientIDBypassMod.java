@@ -2,9 +2,9 @@ package com.novinitygames.clientid.client;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
+import net.minecraft.resources.Identifier;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.Optional;
 
 public class ClientIDBypassMod implements ModInitializer {
     public static final String MODCHECK_CHANNEL = "clientid:modcheck";
@@ -14,9 +14,10 @@ public class ClientIDBypassMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ClientLoginNetworking.registerLoginQuery(MODCHECK_CHANNEL, (request) -> CompletableFuture.completedFuture(Optional.of(ClientIDNetworkHandler.createModCheckPacket())));
-        ClientLoginNetworking.registerLoginQuery(MODLIST_CHANNEL, (request) -> CompletableFuture.completedFuture(Optional.of(ClientIDNetworkHandler.createModListPacket())));
-        ClientLoginNetworking.registerLoginQuery(PACKLIST_CHANNEL, (request) -> CompletableFuture.completedFuture(Optional.of(ClientIDNetworkHandler.createPackListPacket())));
-        ClientLoginNetworking.registerLoginQuery(CLIENTVERSION_CHANNEL, (request) -> CompletableFuture.completedFuture(Optional.of(ClientIDNetworkHandler.createClientVersionPacket())));
+        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODCHECK_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModCheckPacket()));
+        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModListPacket()));
+        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(PACKLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createPackListPacket()));
+        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(CLIENTVERSION_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createClientVersionPacket()));
     }
+}
 }
