@@ -68,12 +68,12 @@ jobs:
 
       - name: Publish to Modrinth
         if: steps.tag.outputs.tag_exists == 'false'
-        uses: matatonic/modrinth-release-action@v1
-        env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        uses: cloudnode-pro/modrinth-publish@v2
         with:
-          file: ${{ steps.jar.outputs.jar }}
-          version_number: ${{ steps.version.outputs.version }}
-          version_name: Release ${{ steps.version.outputs.version }}
-          game_versions: 1.21.11
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: client-id
+          version: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          game-versions: 1.21.11
           loaders: fabric
+          files: ${{ steps.jar.outputs.jar }}
