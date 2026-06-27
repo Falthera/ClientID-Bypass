@@ -3,7 +3,6 @@ package com.novinitygames.clientid.client;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 import com.novinitygames.clientid.client.records.ChartsS2CPayload;
 import com.novinitygames.clientid.client.records.ModCheckC2SPayload;
@@ -14,13 +13,9 @@ import com.novinitygames.clientid.client.records.VersionC2SPayload;
 public class ClientIDBypassMod implements ClientModInitializer {
     public static Boolean isConnectedToServer = false;
     public static Boolean pieChartDisabled = false;
+
     @Override
     public void onInitializeClient() {
-        PayloadTypeRegistry.playC2S().register(ModCheckC2SPayload.ID, ModCheckC2SPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(ModListC2SPayload.ID, ModListC2SPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(PackListC2SPayload.ID, PackListC2SPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(VersionC2SPayload.ID, VersionC2SPayload.CODEC);
-
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             isConnectedToServer = true;
             sendBypassPackets();
