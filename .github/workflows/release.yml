@@ -21,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -29,15 +31,23 @@ jobs:
           distribution: temurin
           cache: gradle
 
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
       - name: Build
         run: ./gradlew build
 
-      - name: Upload Artifact
+      - name: Find JAR
+        id: find-jar
+        run: |
+          JAR_PATH=$(find ./build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-sources.jar" | head -n 1)
+          echo "jar-path=$JAR_PATH" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: mod-jar
-          path: ./build/libs/*.jar
-          retention-days: 1
+          path: ${{ steps.find-jar.outputs.jar-path }}
 
   release:
     needs: build
@@ -46,6 +56,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -60,9 +72,21 @@ jobs:
           name: mod-jar
           path: ./build/libs
 
-      - name: Get Version
+      - name: Read Version
         id: version
-        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        run: |
+          VERSION=$(grep -oP 'mod_version=\K.*' gradle.properties)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Tag
+        id: create-tag
+        run: |
+          NEW_TAG="v${{ steps.version.outputs.version }}"
+          git config --local user.email "action@kilo.ai"
+          git config --local user.name "Kilo Action"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+        shell: bash
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -91,19 +115,3 @@ jobs:
             - 1.21.11
           description: ClientID Bypass mod release
           project_type: mod
-
-      - name: Update Version
-        run: |
-          NEW_VERSION=${{ steps.version.outputs.version }}
-          echo "mod_version=${NEW_VERSION}" > gradle.properties
-          echo "NEW_TAG=v${NEW_VERSION}-next" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Create Next Development Version
-        run: |
-          git config --local user.email "action@kilo.ai"
-          git config --local user.name "Kilo Action"
-          git commit -am "chore(release): bump version to next development" || exit 0
-          git tag ${{ env.NEW_TAG }}
-          git push origin HEAD --tags
-        shell: bash
