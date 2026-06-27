@@ -100,6 +100,18 @@ $RECYCLE.BIN/
 
 target/
 
+# Spigot plugin files
+pom.xml
+src/main/resources/project.properties
+src/main/resources/plugin.yml
+src/main/resources/config.yml
+src/main/java/com/novinitygames/clientid/Properties.java
+src/main/java/com/novinitygames/clientid/ClientID.java
+src/main/java/com/novinitygames/clientid/packet/
+src/main/java/com/novinitygames/clientid/utils/
+src/main/java/com/novinitygames/clientid/commands/
+src/main/java/com/novinitygames/clientid/listeners/
+
 # Common working directory
 run/
 
