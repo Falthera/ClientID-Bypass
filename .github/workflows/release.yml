@@ -83,10 +83,14 @@ jobs:
 
       - name: Publish to Modrinth
         if: steps.tag.outputs.tag_exists == 'false'
-        uses: matatonic/modrinth-release-action@v1
+        uses: cloudnode-pro/modrinth-publish@v2
         env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ${{ steps.jar.outputs.jar }}
-          version_number: ${{ steps.version.outputs.version }}
-          version_name: Release ${{ steps.version.outputs.version }}
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: BfVAPsBN
+          version: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          loaders: fabric
+          game-versions: 1.21.11
+          files: ${{ steps.jar.outputs.jar }}
