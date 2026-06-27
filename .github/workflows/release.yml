@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -18,52 +17,76 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-          cache: gradle
+       - name: Setup Java
+         uses: actions/setup-java@v4
+         with:
+           java-version: 21
+           distribution: temurin
+           cache: gradle
 
-      - name: Make Gradle executable
-        run: chmod +x gradlew
+       - name: Make gradlew executable
+         run: chmod +x gradlew
 
-      - name: Build
-        run: ./gradlew build
+       - name: Bump Version
+         run: |
+           VERSION=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+           MAJOR=$(echo $VERSION | cut -d. -f1)
+           MINOR=$(echo $VERSION | cut -d. -f2)
+           PATCH=$(echo $VERSION | cut -d. -f3)
+           PATCH=$((PATCH + 1))
+           NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+           sed -i "s/^mod_version=.*/mod_version=$NEW_VERSION/" gradle.properties
+           git config user.name "github-actions"
+           git config user.email "github-actions@github.com"
+           git add gradle.properties
+           git commit -m "Bump version to $NEW_VERSION [skip ci]"
+           git push origin main
 
-      - name: Read version
-        id: version
-        run: |
-          VERSION=$(grep "^mod_version=" gradle.properties | cut -d= -f2)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+       - name: Read Version
+         id: version
+         run: |
+           VERSION=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Find JAR
-        id: jar
-        run: |
-          FILE=$(find build/libs -maxdepth 1 -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n1)
-          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+       - name: Check and Create Tag
+         id: tag
+         run: |
+           git fetch --tags
+           if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+             echo "tag_exists=true" >> $GITHUB_OUTPUT
+           else
+             echo "tag_exists=false" >> $GITHUB_OUTPUT
+             git tag "v${{ steps.version.outputs.version }}"
+             git push origin "v${{ steps.version.outputs.version }}"
+           fi
 
-      - name: Create tag
-        run: |
-          TAG="v${{ steps.version.outputs.version }}"
+       - name: Build
+         run: ./gradlew build
 
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag already exists."
-            exit 0
-          fi
-
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-
-          git tag "$TAG"
-          git push origin "$TAG"
+       - name: Find JAR File
+         id: jar
+         run: |
+           JAR_FILE=$(ls build/libs/*.jar | head -n1)
+           echo "jar=${JAR_FILE}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
+        if: steps.tag.outputs.tag_exists == 'false'
         uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
-          files: ${{ steps.jar.outputs.file }}
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          files: ${{ steps.jar.outputs.jar }}
+          draft: false
+          prerelease: false
+
+      - name: Publish to Modrinth
+        if: steps.tag.outputs.tag_exists == 'false'
+        uses: matatonic/modrinth-release-action@v1
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        with:
+          file: ${{ steps.jar.outputs.jar }}
+          version_number: ${{ steps.version.outputs.version }}
+          version_name: Release ${{ steps.version.outputs.version }}
