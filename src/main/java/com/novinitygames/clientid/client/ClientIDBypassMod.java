@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
+import com.novinitygames.clientid.client.records.ChartsS2CPayload;
 import com.novinitygames.clientid.client.records.ModCheckC2SPayload;
 import com.novinitygames.clientid.client.records.ModListC2SPayload;
 import com.novinitygames.clientid.client.records.PackListC2SPayload;
