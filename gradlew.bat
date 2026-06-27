@@ -38,6 +38,11 @@ echo ERROR: JAVA_HOME is not set and no 'java' executable found in PATH. >&2
 exit /b 1
 
 :findJavaFromJavaHome
+
+echo ERROR: JAVA_HOME is not set and no 'java' executable found in PATH. >&2
+exit /b 1
+
+:findJavaFromJavaHome
 if exist "%JAVA_HOME%\bin\java.exe" (
     set JAVACMD="%JAVA_HOME%\bin\java.exe"
     goto checkJAVACMD
