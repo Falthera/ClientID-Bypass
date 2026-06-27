@@ -20,4 +20,3 @@ public class ClientIDBypassMod implements ModInitializer {
         ClientLoginNetworking.registerGlobalReceiver(Identifier.of(CLIENTVERSION_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createClientVersionPacket()));
     }
 }
-}
