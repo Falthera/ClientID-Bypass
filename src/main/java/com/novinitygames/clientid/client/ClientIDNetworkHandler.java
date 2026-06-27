@@ -1,33 +1,65 @@
 package com.novinitygames.clientid.client;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 
 public class ClientIDNetworkHandler {
-    public static String MODCHECK_CHANNEL = "clientid:modcheck";
-    public static String MODLIST_CHANNEL = "clientid:modlist";
-    public static String PACKLIST_CHANNEL = "clientid:packlist";
-    public static String CLIENTVERSION_CHANNEL = "clientid:clientversion";
+    public static final Identifier MODCHECK_CHANNEL = Identifier.of("clientid", "modcheck");
+    public static final Identifier MODLIST_CHANNEL = Identifier.of("clientid", "modlist");
+    public static final Identifier PACKLIST_CHANNEL = Identifier.of("clientid", "packlist");
+    public static final Identifier CLIENTVERSION_CHANNEL = Identifier.of("clientid", "clientversion");
 
-    public static PacketByteBuf createModCheckPacket() {
-        return createMessage("valid_checksum");
+    public record ModCheckPayload(String value) implements CustomPayload {
+        public static final CustomPayload.Id<ModCheckPayload> ID = new CustomPayload.Id<>(MODCHECK_CHANNEL);
+        public static final PacketCodec<PacketByteBuf, ModCheckPayload> CODEC = PacketCodec.of(
+            (buf, payload) -> buf.writeString(payload.value),
+            buf -> new ModCheckPayload(buf.readString())
+        );
+
+        @Override
+        public CustomPayload.Id<? extends CustomPayload> getId() {
+            return ID;
+        }
     }
 
-    public static PacketByteBuf createModListPacket() {
-        return createMessage("clientid,sodium,lithium,phosphor,iris");
+    public record ModListPayload(String value) implements CustomPayload {
+        public static final CustomPayload.Id<ModListPayload> ID = new CustomPayload.Id<>(MODLIST_CHANNEL);
+        public static final PacketCodec<PacketByteBuf, ModListPayload> CODEC = PacketCodec.of(
+            (buf, payload) -> buf.writeString(payload.value),
+            buf -> new ModListPayload(buf.readString())
+        );
+
+        @Override
+        public CustomPayload.Id<? extends CustomPayload> getId() {
+            return ID;
+        }
     }
 
-    public static PacketByteBuf createPackListPacket() {
-        return createMessage("");
+    public record PackListPayload(String value) implements CustomPayload {
+        public static final CustomPayload.Id<PackListPayload> ID = new CustomPayload.Id<>(PACKLIST_CHANNEL);
+        public static final PacketCodec<PacketByteBuf, PackListPayload> CODEC = PacketCodec.of(
+            (buf, payload) -> buf.writeString(payload.value),
+            buf -> new PackListPayload(buf.readString())
+        );
+
+        @Override
+        public CustomPayload.Id<? extends CustomPayload> getId() {
+            return ID;
+        }
     }
 
-    public static PacketByteBuf createClientVersionPacket() {
-        return createMessage("1.1.7");
-    }
+    public record ClientVersionPayload(String value) implements CustomPayload {
+        public static final CustomPayload.Id<ClientVersionPayload> ID = new CustomPayload.Id<>(CLIENTVERSION_CHANNEL);
+        public static final PacketCodec<PacketByteBuf, ClientVersionPayload> CODEC = PacketCodec.of(
+            (buf, payload) -> buf.writeString(payload.value),
+            buf -> new ClientVersionPayload(buf.readString())
+        );
 
-    private static PacketByteBuf createMessage(String message) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeString(message);
-        return buf;
+        @Override
+        public CustomPayload.Id<? extends CustomPayload> getId() {
+            return ID;
+        }
     }
 }

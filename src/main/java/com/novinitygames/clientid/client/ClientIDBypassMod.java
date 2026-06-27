@@ -1,22 +1,41 @@
 package com.novinitygames.clientid.client;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
-import net.minecraft.util.Identifier;
-
-import java.util.concurrent.CompletableFuture;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class ClientIDBypassMod implements ClientModInitializer {
-    public static final String MODCHECK_CHANNEL = "clientid:modcheck";
-    public static final String MODLIST_CHANNEL = "clientid:modlist";
-    public static final String PACKLIST_CHANNEL = "clientid:packlist";
-    public static final String CLIENTVERSION_CHANNEL = "clientid:clientversion";
-
     @Override
     public void onInitializeClient() {
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODCHECK_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModCheckPacket()));
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModListPacket()));
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(PACKLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createPackListPacket()));
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(CLIENTVERSION_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createClientVersionPacket()));
+        PayloadTypeRegistry.playS2C().register(ModCheckPayload.ID, ModCheckPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(ModListPayload.ID, ModListPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(PackListPayload.ID, PackListPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(ClientVersionPayload.ID, ClientVersionPayload.CODEC);
+
+        PayloadTypeRegistry.playC2S().register(ModCheckPayload.ID, ModCheckPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(ModListPayload.ID, ModListPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(PackListPayload.ID, PackListPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(ClientVersionPayload.ID, ClientVersionPayload.CODEC);
+
+        ClientPlayNetworking.registerGlobalReceiver(ModCheckPayload.ID, (payload, context) -> {
+            context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new ModCheckPayload("valid_checksum")));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(ModListPayload.ID, (payload, context) -> {
+            context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new ModListPayload("clientid,sodium,lithium,phosphor,iris")));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(PackListPayload.ID, (payload, context) -> {
+            context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new PackListPayload("")));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(ClientVersionPayload.ID, (payload, context) -> {
+            context.responseSender().sendPacket(ClientPlayNetworking.createC2SPacket(new ClientVersionPayload("1.1.7")));
+        });
+
+        ClientPlayConnectionEvents.JOIN.register((listener, sender, client) -> {
+            ClientPlayNetworking.send(new ModCheckPayload("valid_checksum"));
+            ClientPlayNetworking.send(new ModListPayload("clientid,sodium,lithium,phosphor,iris"));
+            ClientPlayNetworking.send(new PackListPayload(""));
+            ClientPlayNetworking.send(new ClientVersionPayload("1.1.7"));
+        });
     }
 }
