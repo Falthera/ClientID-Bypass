@@ -2,7 +2,7 @@ package com.novinitygames.clientid.client;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
-import net.minecraft.core.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -14,9 +14,9 @@ public class ClientIDBypassMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODCHECK_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModCheckPacket()));
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(MODLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModListPacket()));
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(PACKLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createPackListPacket()));
-        ClientLoginNetworking.registerGlobalReceiver(Identifier.of(CLIENTVERSION_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createClientVersionPacket()));
+        ClientLoginNetworking.registerGlobalReceiver(ResourceLocation.parse(MODCHECK_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModCheckPacket()));
+        ClientLoginNetworking.registerGlobalReceiver(ResourceLocation.parse(MODLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createModListPacket()));
+        ClientLoginNetworking.registerGlobalReceiver(ResourceLocation.parse(PACKLIST_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createPackListPacket()));
+        ClientLoginNetworking.registerGlobalReceiver(ResourceLocation.parse(CLIENTVERSION_CHANNEL), (client, handler, buf, callbacks) -> CompletableFuture.completedFuture(ClientIDNetworkHandler.createClientVersionPacket()));
     }
 }
