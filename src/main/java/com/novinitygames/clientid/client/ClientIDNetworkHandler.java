@@ -14,7 +14,7 @@ public class ClientIDNetworkHandler {
     public record ModCheckPayload(String value) implements CustomPayload {
         public static final CustomPayload.Id<ModCheckPayload> ID = new CustomPayload.Id<>(MODCHECK_CHANNEL);
         public static final PacketCodec<PacketByteBuf, ModCheckPayload> CODEC = PacketCodec.of(
-            (buf, payload) -> buf.writeString(payload.value),
+            (buf, payload) -> buf.writeString(payload.value()),
             buf -> new ModCheckPayload(buf.readString())
         );
 
@@ -27,7 +27,7 @@ public class ClientIDNetworkHandler {
     public record ModListPayload(String value) implements CustomPayload {
         public static final CustomPayload.Id<ModListPayload> ID = new CustomPayload.Id<>(MODLIST_CHANNEL);
         public static final PacketCodec<PacketByteBuf, ModListPayload> CODEC = PacketCodec.of(
-            (buf, payload) -> buf.writeString(payload.value),
+            (buf, payload) -> buf.writeString(payload.value()),
             buf -> new ModListPayload(buf.readString())
         );
 
@@ -40,7 +40,7 @@ public class ClientIDNetworkHandler {
     public record PackListPayload(String value) implements CustomPayload {
         public static final CustomPayload.Id<PackListPayload> ID = new CustomPayload.Id<>(PACKLIST_CHANNEL);
         public static final PacketCodec<PacketByteBuf, PackListPayload> CODEC = PacketCodec.of(
-            (buf, payload) -> buf.writeString(payload.value),
+            (buf, payload) -> buf.writeString(payload.value()),
             buf -> new PackListPayload(buf.readString())
         );
 
@@ -53,7 +53,7 @@ public class ClientIDNetworkHandler {
     public record ClientVersionPayload(String value) implements CustomPayload {
         public static final CustomPayload.Id<ClientVersionPayload> ID = new CustomPayload.Id<>(CLIENTVERSION_CHANNEL);
         public static final PacketCodec<PacketByteBuf, ClientVersionPayload> CODEC = PacketCodec.of(
-            (buf, payload) -> buf.writeString(payload.value),
+            (buf, payload) -> buf.writeString(payload.value()),
             buf -> new ClientVersionPayload(buf.readString())
         );
 

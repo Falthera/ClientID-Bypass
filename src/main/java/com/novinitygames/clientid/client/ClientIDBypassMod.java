@@ -5,6 +5,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
+import com.novinitygames.clientid.client.ClientIDNetworkHandler.ModCheckPayload;
+import com.novinitygames.clientid.client.ClientIDNetworkHandler.ModListPayload;
+import com.novinitygames.clientid.client.ClientIDNetworkHandler.PackListPayload;
+import com.novinitygames.clientid.client.ClientIDNetworkHandler.ClientVersionPayload;
+
 public class ClientIDBypassMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
