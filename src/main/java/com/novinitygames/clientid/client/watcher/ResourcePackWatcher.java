@@ -1,7 +1,7 @@
 package com.novinitygames.clientid.client.watcher;
 
 import com.novinitygames.clientid.ClientID;
-import com.novinitygames.clientid.client.ClientIDClient;
+import com.novinitygames.clientid.client.ClientIDBypassMod;
 import com.novinitygames.clientid.client.records.PackListC2SPayload;
 import com.novinitygames.clientid.client.util.ListerUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -47,7 +47,7 @@ public class ResourcePackWatcher implements SimpleSynchronousResourceReloadListe
         removed.removeAll(current);
 
         if (!added.isEmpty() || !removed.isEmpty()) {
-            if (ClientIDClient.isConnectedToServer) {
+            if (ClientIDBypassMod.isConnectedToServer) {
                 String enabledPacks = String.join(",", ListerUtil.getEnabledPacks());
                 PackListC2SPayload payload = new PackListC2SPayload(enabledPacks);
                 ClientPlayNetworking.send(payload);

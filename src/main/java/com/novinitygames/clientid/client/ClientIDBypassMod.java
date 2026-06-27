@@ -11,6 +11,8 @@ import com.novinitygames.clientid.client.records.PackListC2SPayload;
 import com.novinitygames.clientid.client.records.VersionC2SPayload;
 
 public class ClientIDBypassMod implements ClientModInitializer {
+    public static Boolean isConnectedToServer = false;
+    public static Boolean pieChartDisabled = false;
     @Override
     public void onInitializeClient() {
         PayloadTypeRegistry.playC2S().register(ModCheckC2SPayload.ID, ModCheckC2SPayload.CODEC);
@@ -19,6 +21,7 @@ public class ClientIDBypassMod implements ClientModInitializer {
         PayloadTypeRegistry.playC2S().register(VersionC2SPayload.ID, VersionC2SPayload.CODEC);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            isConnectedToServer = true;
             sendBypassPackets();
         });
 
@@ -33,6 +36,15 @@ public class ClientIDBypassMod implements ClientModInitializer {
         });
         ClientPlayNetworking.registerGlobalReceiver(VersionC2SPayload.ID, (payload, ctx) -> {
             ctx.responseSender().sendPacket(new VersionC2SPayload("1.1.7"));
+        });
+
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {
+            isConnectedToServer = false;
+            pieChartDisabled = false;
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(ChartsS2CPayload.ID, (payload, ctx) -> {
+            pieChartDisabled = payload.val();
         });
     }
 

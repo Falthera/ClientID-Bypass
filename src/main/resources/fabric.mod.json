@@ -11,7 +11,7 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "com.novinitygames.clientid.client.ClientIDClient"
+      "com.novinitygames.clientid.client.ClientIDBypassMod"
     ],
     "main": [
       "com.novinitygames.clientid.ClientID"
