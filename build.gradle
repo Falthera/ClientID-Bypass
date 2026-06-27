@@ -24,7 +24,7 @@ repositories {
 
 def minecraft_version = "1.21.11"
 def yarn_mappings = "1.21.11+build.4"
-def loader_version = project.fabric_loader_version
+def loader_version = project.loader_version
 def fabric_version = project.fabric_version
 
 dependencies {
