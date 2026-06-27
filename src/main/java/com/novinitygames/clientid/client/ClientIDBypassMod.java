@@ -2,7 +2,7 @@ package com.novinitygames.clientid.client;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
-import net.minecraft.Identifier;
+import net.minecraft.core.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
