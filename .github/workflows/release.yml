@@ -1,0 +1,109 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: gradle
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-jar
+          path: ./build/libs/*.jar
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'chore(release): bump version') }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: gradle
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: mod-jar
+          path: ./build/libs
+
+      - name: Get Version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Release ${{ steps.version.outputs.version }}
+            See changelog for details.
+          files: ./build/libs/*.jar
+          draft: false
+          prerelease: false
+
+      - name: Publish to Modrinth
+        uses: modrinth/action/publish@v1
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        with:
+          file: ./build/libs/*.jar
+          version_number: ${{ steps.version.outputs.version }}
+          version_title: ${{ steps.version.outputs.version }}
+          loaders:
+            - fabric
+          game_versions:
+            - 1.21.11
+          description: ClientID Bypass mod release
+          project_type: mod
+
+      - name: Update Version
+        run: |
+          NEW_VERSION=${{ steps.version.outputs.version }}
+          echo "mod_version=${NEW_VERSION}" > gradle.properties
+          echo "NEW_TAG=v${NEW_VERSION}-next" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Create Next Development Version
+        run: |
+          git config --local user.email "action@kilo.ai"
+          git config --local user.name "Kilo Action"
+          git commit -am "chore(release): bump version to next development" || exit 0
+          git tag ${{ env.NEW_TAG }}
+          git push origin HEAD --tags
+        shell: bash
