@@ -15,18 +15,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-<<<<<<< HEAD
         with:
           fetch-depth: 0
 
       - name: Setup Java
         uses: actions/setup-java@v4
-=======
->>>>>>> 6fe368fe7756f1f204266dbde1f4f212a0c58705
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
@@ -38,69 +31,17 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-<<<<<<< HEAD
-      - name: Find JAR
-        id: find-jar
-        run: |
-          JAR_PATH=$(find ./build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-sources.jar" | head -n 1)
-          echo "jar-path=$JAR_PATH" >> $GITHUB_OUTPUT
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mod-jar
-          path: ${{ steps.find-jar.outputs.jar-path }}
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'chore(release): bump version') }}
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          distribution: temurin
-          cache: gradle
-
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: mod-jar
-          path: ./build/libs
-
-      - name: Read Version
-        id: version
-        run: |
-          VERSION=$(grep -oP 'mod_version=\K.*' gradle.properties)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create Tag
-        id: create-tag
-        run: |
-          NEW_TAG="v${{ steps.version.outputs.version }}"
-          git config --local user.email "action@kilo.ai"
-          git config --local user.name "Kilo Action"
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-        shell: bash
-=======
       - name: Read version
         id: version
         run: |
           VERSION=$(grep "^mod_version=" gradle.properties | cut -d= -f2)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Find JAR
         id: jar
         run: |
           FILE=$(find build/libs -maxdepth 1 -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n1)
-          echo "file=$FILE" >> $GITHUB_OUTPUT
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
 
       - name: Create tag
         run: |
@@ -116,7 +57,6 @@ jobs:
 
           git tag "$TAG"
           git push origin "$TAG"
->>>>>>> 6fe368fe7756f1f204266dbde1f4f212a0c58705
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -127,27 +67,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish to Modrinth
-        uses: modrinth/action/publish@v1
-        with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project_id: YOUR_PROJECT_ID
-          version_number: ${{ steps.version.outputs.version }}
-<<<<<<< HEAD
-          version_title: ${{ steps.version.outputs.version }}
-          loaders:
-            - fabric
-          game_versions:
-            - 1.21.11
-          description: ClientID Bypass mod release
-          project_type: mod
-=======
-          version_name: v${{ steps.version.outputs.version }}
-          version_type: release
-          game_versions: |
-            1.21.11
-          loaders: |
-            fabric
-          files: ${{ steps.jar.outputs.file }}
->>>>>>> 6fe368fe7756f1f204266dbde1f4f212a0c58705
