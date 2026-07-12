@@ -55,24 +55,14 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        if: steps.tag.outputs.tag_exists == 'false'
+        if: steps.jar.outputs.file != ''
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: Release ${{ steps.version.outputs.version }}
-          files: ${{ steps.jar.outputs.jar }}
+          files: ${{ steps.jar.outputs.file }}
           draft: false
           prerelease: false
 
-      - name: Publish to Modrinth
-        uses: modrinth/action/publish@v1
-        with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project: client-id
-          version: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
-          game-versions: 26.1.2
-          loaders: fabric
-          files: ${{ steps.jar.outputs.file }}
