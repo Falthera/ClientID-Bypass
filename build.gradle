@@ -32,7 +32,6 @@ def fabric_version = project.fabric_version
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings "maven.minecraftdev:mappings:minecraft-${minecraft_version}:v2"
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     modImplementation 'me.lucko:fabric-permissions-api:0.4.0'
