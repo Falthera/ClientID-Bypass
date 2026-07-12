@@ -20,7 +20,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 25
           distribution: temurin
           cache: gradle
 
@@ -65,3 +65,10 @@ jobs:
           files: ${{ steps.jar.outputs.jar }}
           draft: false
           prerelease: false
+
+      - name: Publish to Modrinth
+        uses: modrinth/publish@v1
+        with:
+          file: ${{ steps.jar.outputs.jar }}
+          game-versions: 26.1.2
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}

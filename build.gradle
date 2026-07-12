@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.17.12'
+    id 'net.fabricmc.loom' version '1.15'
     id 'maven-publish'
 }
 
@@ -17,19 +17,22 @@ repositories {
         name = "Fabric"
     }
     maven {
+        url = uri("https://maven.minecraft.net/maven2")
+        name = "Mojang"
+    }
+    maven {
         url = uri("https://api.modrinth.com/maven")
         name = "Modrinth"
     }
 }
 
-def minecraft_version = "1.21.11"
-def yarn_mappings = "1.21.11+build.4"
+def minecraft_version = "26.1.2"
 def loader_version = project.loader_version
 def fabric_version = project.fabric_version
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+    mappings "maven.minecraftdev:mappings:minecraft-${minecraft_version}:v2"
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     modImplementation 'me.lucko:fabric-permissions-api:0.4.0'
@@ -49,7 +52,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
