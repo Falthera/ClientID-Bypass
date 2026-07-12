@@ -67,8 +67,12 @@ jobs:
           prerelease: false
 
       - name: Publish to Modrinth
-        uses: modrinth/publish@v1
+        uses: modrinth/action/publish@v1
         with:
-          file: ${{ steps.jar.outputs.jar }}
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: client-id
+          version: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
           game-versions: 26.1.2
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          loaders: fabric
+          files: ${{ steps.jar.outputs.file }}
